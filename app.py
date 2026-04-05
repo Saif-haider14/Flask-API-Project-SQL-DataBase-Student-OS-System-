@@ -6,14 +6,18 @@ from database import (init_db, get_all_students, get_student_by_id,
                        search_students, get_students_paginated,
                        get_total_students, search_students_paginated)
 
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 app = Flask(__name__)
 app.secret_key = "student_manager_secret_key_2024"
 
 # ──────────────────────────────────────────────
 # ADMIN CREDENTIALS (hardcoded)
 # ──────────────────────────────────────────────
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD_HASH = generate_password_hash("admin123")
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD_HASH = generate_password_hash(os.getenv("ADMIN_PASSWORD"))
 
 # Initialize the database when app starts
 init_db()
