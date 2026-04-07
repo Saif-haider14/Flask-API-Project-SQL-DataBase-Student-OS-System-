@@ -3,7 +3,11 @@
 
 :root {
   --bg:        #0d0f14;
+<<<<<<< HEAD
   --bg2:       #13161e;
+=======
+  --bg2:       #13161e:
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
   --bg3:       #1a1e28;
   --border:    #252a38;
   --border2:   #2e3448;
@@ -496,6 +500,7 @@ body {
   .search-input { width: 100%; }
 }
 
+<<<<<<< HEAD
 /* ── ATTENDANCE STYLES ──────────────────────── */
 
 .page-hero {
@@ -564,4 +569,71 @@ body {
 @media (max-width: 640px) {
   .att-card { flex-direction: column; align-items: flex-start; }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
+=======
+/* ── PAGINATION ───────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 0 2px;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: var(--text3);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  background: var(--bg2);
+  color: var(--text2);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+.page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
+  background: var(--bg3);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.page-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  cursor: default;
+}
+
+.page-btn.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.page-btn.ellipsis {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+  color: var(--text3);
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
 }

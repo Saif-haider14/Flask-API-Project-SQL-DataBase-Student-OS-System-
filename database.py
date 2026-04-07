@@ -1,11 +1,18 @@
 import sqlite3
+<<<<<<< HEAD
 from datetime import datetime
+=======
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
 
 DB_NAME = "students.db"
 
 def get_connection():
     conn = sqlite3.connect(DB_NAME)
+<<<<<<< HEAD
     conn.row_factory = sqlite3.Row
+=======
+    conn.row_factory = sqlite3.Row  # allows dict-like access to rows
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
     return conn
 
 def init_db():
@@ -32,6 +39,43 @@ def get_all_students():
     conn.close()
     return students
 
+<<<<<<< HEAD
+=======
+def get_students_paginated(page, per_page=10):
+    conn = get_connection()
+    offset = (page - 1) * per_page
+    students = conn.execute(
+        "SELECT * FROM students ORDER BY id DESC LIMIT ? OFFSET ?",
+        (per_page, offset)
+    ).fetchall()
+    conn.close()
+    return students
+
+def get_total_students():
+    conn = get_connection()
+    count = conn.execute("SELECT COUNT(*) FROM students").fetchone()[0]
+    conn.close()
+    return count
+
+def search_students_paginated(query, page, per_page=10):
+    conn = get_connection()
+    like = f"%{query}%"
+    offset = (page - 1) * per_page
+    students = conn.execute(
+        """SELECT * FROM students
+           WHERE name LIKE ? OR roll_no LIKE ? OR email LIKE ? OR grade LIKE ?
+           ORDER BY id DESC LIMIT ? OFFSET ?""",
+        (like, like, like, like, per_page, offset)
+    ).fetchall()
+    total = conn.execute(
+        """SELECT COUNT(*) FROM students
+           WHERE name LIKE ? OR roll_no LIKE ? OR email LIKE ? OR grade LIKE ?""",
+        (like, like, like, like)
+    ).fetchone()[0]
+    conn.close()
+    return students, total
+
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
 def get_student_by_id(student_id):
     conn = get_connection()
     student = conn.execute("SELECT * FROM students WHERE id = ?", (student_id,)).fetchone()
@@ -82,6 +126,7 @@ def search_students(query):
     ).fetchall()
     conn.close()
     return students
+<<<<<<< HEAD
 
 # ──────────────────────────────────────────────
 # ATTENDANCE FUNCTIONS
@@ -159,3 +204,5 @@ def get_student_attendance_history(student_id, limit=50):
     """, (student_id, limit)).fetchall()
     conn.close()
     return [dict(r) for r in records]
+=======
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6

@@ -5,7 +5,16 @@
 <div class="page-hero">
   <div>
     <h1 class="page-title">Student Records</h1>
+<<<<<<< HEAD
     <p class="page-subtitle">{{ students|length }} student{{ 's' if students|length != 1 }} enrolled</p>
+=======
+    <p class="page-subtitle">
+      {{ total }} student{{ 's' if total != 1 }} enrolled
+      {% if total_pages > 1 %}
+        — page {{ page }} of {{ total_pages }}
+      {% endif %}
+    </p>
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
   </div>
 
   <form class="search-form" method="GET" action="{{ url_for('index') }}">
@@ -44,7 +53,11 @@
       <tbody>
         {% for s in students %}
         <tr class="student-row" style="animation-delay: {{ loop.index0 * 0.04 }}s">
+<<<<<<< HEAD
           <td class="td-index">{{ loop.index }}</td>
+=======
+          <td class="td-index">{{ (page - 1) * per_page + loop.index }}</td>
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
           <td class="td-student">
             <div class="avatar" style="--hue: {{ (s['name']|length * 47) % 360 }}">
               {{ s['name'][0].upper() }}
@@ -70,6 +83,48 @@
     </table>
   </div>
 
+<<<<<<< HEAD
+=======
+  <!-- ── PAGINATION ── -->
+  {% if total_pages > 1 %}
+  <div class="pagination">
+    <div class="pagination-info">
+      Showing {{ (page - 1) * per_page + 1 }}–{{ [page * per_page, total] | min }}
+      of {{ total }} students
+    </div>
+
+    <div class="pagination-controls">
+
+      <!-- Previous -->
+      {% if page > 1 %}
+        <a href="{{ url_for('index', page=page-1, q=query) }}" class="page-btn">← Prev</a>
+      {% else %}
+        <span class="page-btn disabled">← Prev</span>
+      {% endif %}
+
+      <!-- Page numbers -->
+      {% for p in range(1, total_pages + 1) %}
+        {% if p == page %}
+          <span class="page-btn active">{{ p }}</span>
+        {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+          <a href="{{ url_for('index', page=p, q=query) }}" class="page-btn">{{ p }}</a>
+        {% elif p == page - 3 or p == page + 3 %}
+          <span class="page-btn ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Next -->
+      {% if page < total_pages %}
+        <a href="{{ url_for('index', page=page+1, q=query) }}" class="page-btn">Next →</a>
+      {% else %}
+        <span class="page-btn disabled">Next →</span>
+      {% endif %}
+
+    </div>
+  </div>
+  {% endif %}
+
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
 {% else %}
   <div class="empty-state">
     <div class="empty-icon">◎</div>

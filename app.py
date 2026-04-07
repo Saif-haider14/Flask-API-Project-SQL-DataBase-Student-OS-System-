@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+<<<<<<< HEAD
 from datetime import datetime, date
 from database import (
     init_db, get_all_students, get_student_by_id, add_student, update_student, 
@@ -8,6 +9,16 @@ from database import (
     create_attendance_table, get_attendance_for_date, bulk_mark_attendance,
     get_attendance_summary, get_student_attendance_history
 )
+=======
+from database import (init_db, get_all_students, get_student_by_id,
+                       add_student, update_student, delete_student,
+                       search_students, get_students_paginated,
+                       get_total_students, search_students_paginated)
+
+from dotenv import load_dotenv
+import os
+load_dotenv()
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
 
 app = Flask(__name__)
 app.secret_key = "student_manager_secret_key_2024"
@@ -15,12 +26,20 @@ app.secret_key = "student_manager_secret_key_2024"
 # ──────────────────────────────────────────────
 # ADMIN CREDENTIALS (hardcoded)
 # ──────────────────────────────────────────────
+<<<<<<< HEAD
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD_HASH = generate_password_hash("admin123")
 
 # Initialize the database when app starts
 init_db()
 create_attendance_table()
+=======
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD_HASH = generate_password_hash(os.getenv("ADMIN_PASSWORD"))
+
+# Initialize the database when app starts
+init_db()
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
 
 # ──────────────────────────────────────────────
 # LOGIN REQUIRED DECORATOR
@@ -66,17 +85,50 @@ def logout():
     return redirect(url_for("login"))
 
 # ──────────────────────────────────────────────
+<<<<<<< HEAD
 # MAIN PAGE — show all students
 # ──────────────────────────────────────────────
+=======
+# MAIN PAGE — show all students (with pagination)
+# ──────────────────────────────────────────────
+PER_PAGE = 10
+
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
 @app.route("/")
 @login_required
 def index():
     query = request.args.get("q", "").strip()
+<<<<<<< HEAD
     if query:
         students = search_students(query)
     else:
         students = get_all_students()
     return render_template("index.html", students=students, query=query)
+=======
+    page  = request.args.get("page", 1, type=int)
+    if page < 1:
+        page = 1
+
+    if query:
+        students, total = search_students_paginated(query, page, PER_PAGE)
+    else:
+        students = get_students_paginated(page, PER_PAGE)
+        total    = get_total_students()
+
+    total_pages = max(1, -(-total // PER_PAGE))  # ceiling division
+    if page > total_pages:
+        page = total_pages
+
+    return render_template(
+        "index.html",
+        students=students,
+        query=query,
+        page=page,
+        total=total,
+        total_pages=total_pages,
+        per_page=PER_PAGE
+    )
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
 
 # ──────────────────────────────────────────────
 # ADD STUDENT
@@ -148,6 +200,7 @@ def delete(student_id):
     return redirect(url_for("index"))
 
 # ──────────────────────────────────────────────
+<<<<<<< HEAD
 # ATTENDANCE — Dashboard
 # ──────────────────────────────────────────────
 @app.route("/attendance")
@@ -220,6 +273,9 @@ def student_attendance(student_id):
 
 # ──────────────────────────────────────────────
 # API ENDPOINT
+=======
+# API ENDPOINT — returns JSON (optional use)
+>>>>>>> 6f7e69e2888e5654b01ed7c69dbea87bc0c132c6
 # ──────────────────────────────────────────────
 @app.route("/api/students")
 def api_students():
