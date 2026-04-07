@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Attendance Dashboard — StudentOS{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div>
+    <h1 class="page-title">📋 Attendance Dashboard</h1>
+    <p class="page-sub">Track and manage student attendance</p>
+  </div>
+  <div class="hero-actions">
+    <a href="{{ url_for('mark_attendance_route') }}" class="btn-primary">✅ Mark Attendance</a>
+  </div>
+</div>
+
+<!-- Date Filter -->
+<div class="card" style="margin-bottom:20px; padding:16px 20px;">
+  <form method="GET" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+    <label style="font-weight:600; font-size:14px;">📅 Select Date:</label>
+    <input type="date" name="date" value="{{ selected_date }}" max="{{ today }}"
+           onchange="this.form.submit()"
+           style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);
+                  padding:8px 12px; border-radius:6px; font-size:14px; outline:none;">
+    <button type="submit" class="btn-primary" style="padding:8px 16px; font-size:13px;">View</button>
+    {% if selected_date == today %}
+      <span style="background:#22c55e22; color:#22c55e; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600;">Today</span>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Summary Stats -->
+{% if summary %}
+<div class="stats-row">
+  <div class="stat-box">
+    <div class="stat-num">{{ summary.total_students }}</div>
+    <div class="stat-lbl">👥 Total Students</div>
+  </div>
+  <div class="stat-box stat-green">
+    <div class="stat-num">{{ summary.total_present }}</div>
+    <div class="stat-lbl">✅ Present</div>
+  </div>
+  <div class="stat-box stat-yellow">
+    <div class="stat-num">{{ summary.total_late }}</div>
+    <div class="stat-lbl">⏰ Late</div>
+  </div>
+  <div class="stat-box stat-red">
+    <div class="stat-num">{{ summary.total_absent }}</div>
+    <div class="stat-lbl">❌ Absent</div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Attendance Table -->
+<div class="card">
+  <div class="card-header">
+    <h2 style="font-size:16px; margin:0;">Attendance for {{ selected_date }}</h2>
+  </div>
+
+  {% if attendance_records %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Roll No.</th>
+          <th>Student Name</th>
+          <th>Grade</th>
+          <th>Status</th>
+          <th>Time Marked</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in attendance_records %}
+        <tr>
+          <td>{{ r.roll_no }}</td>
+          <td><strong>{{ r.name }}</strong></td>
+          <td>{{ r.grade }}</td>
+          <td>
+            {% if r.status == 'present' %}
+              <span class="badge badge-green">Present</span>
+            {% elif r.status == 'absent' %}
+              <span class="badge badge-red">Absent</span>
+            {% elif r.status == 'late' %}
+              <span class="badge badge-yellow">Late</span>
+            {% else %}
+              <span class="badge badge-gray">Not Marked</span>
+            {% endif %}
+          </td>
+          <td>{{ r.time_marked if r.time_marked else '—' }}</td>
+          <td>
+            <a href="{{ url_for('student_attendance', student_id=r.id) }}" class="btn-sm">📊 History</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div style="font-size:48px;">📅</div>
+    <h3>No attendance records for {{ selected_date }}</h3>
+    <a href="{{ url_for('mark_attendance_route') }}" class="btn-primary">Mark Attendance</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

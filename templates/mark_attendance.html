@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Mark Attendance — StudentOS{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div>
+    <h1 class="page-title">✅ Mark Attendance</h1>
+    <p class="page-sub">Mark present, absent, or late for each student</p>
+  </div>
+  <div class="hero-actions">
+    <a href="{{ url_for('attendance') }}" class="btn-secondary">← Back</a>
+  </div>
+</div>
+
+<div class="card">
+  <form method="POST" id="attendanceForm">
+
+    <!-- Date -->
+    <div class="form-group" style="margin-bottom:24px;">
+      <label>📅 Attendance Date *</label>
+      <input type="date" name="attendance_date"
+             value="{{ request.form.get('attendance_date', today) }}"
+             max="{{ today }}" required
+             style="background:var(--bg3); border:1px solid var(--border2); color:var(--text);
+                    padding:10px 14px; border-radius:6px; font-size:14px; outline:none; width:220px; display:block; margin-top:6px;">
+    </div>
+
+    <!-- Bulk Actions -->
+    <div style="display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap;">
+      <button type="button" onclick="markAll('present')" class="btn-primary" style="background:#22c55e; border-color:#22c55e;">✅ All Present</button>
+      <button type="button" onclick="markAll('absent')" class="btn-primary" style="background:#ef4444; border-color:#ef4444;">❌ All Absent</button>
+      <button type="button" onclick="clearAll()" class="btn-secondary">🔄 Clear All</button>
+    </div>
+
+    <!-- Students -->
+    {% if students %}
+    <div class="att-grid">
+      {% for s in students %}
+      <div class="att-card" id="card_{{ s.id }}">
+        <div class="att-avatar">{{ s.name[0].upper() }}</div>
+        <div class="att-info">
+          <div class="att-name">{{ s.name }}</div>
+          <div class="att-meta">{{ s.roll_no }} | {{ s.grade }}</div>
+        </div>
+        <div class="att-radios">
+          <label class="att-radio att-present">
+            <input type="radio" name="student_{{ s.id }}" value="present" onchange="highlightCard({{ s.id }}, 'present')">
+            <span>Present</span>
+          </label>
+          <label class="att-radio att-late">
+            <input type="radio" name="student_{{ s.id }}" value="late" onchange="highlightCard({{ s.id }}, 'late')">
+            <span>Late</span>
+          </label>
+          <label class="att-radio att-absent">
+            <input type="radio" name="student_{{ s.id }}" value="absent" onchange="highlightCard({{ s.id }}, 'absent')">
+            <span>Absent</span>
+          </label>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Progress -->
+    <div id="progressWrap" style="margin:20px 0; display:none;">
+      <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+        <span>Progress</span>
+        <span id="progressText">0 / {{ students|length }}</span>
+      </div>
+      <div style="background:var(--bg3); border-radius:999px; height:8px; overflow:hidden;">
+        <div id="progressBar" style="height:100%; background:var(--accent); width:0%; transition:width 0.3s; border-radius:999px;"></div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">💾 Save Attendance</button>
+      <a href="{{ url_for('attendance') }}" class="btn-secondary">Cancel</a>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div style="font-size:48px;">👥</div>
+      <h3>No students found</h3>
+      <p>Add students first before marking attendance.</p>
+      <a href="{{ url_for('add') }}" class="btn-primary">+ Add Student</a>
+    </div>
+    {% endif %}
+
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const total = {{ students|length if students else 0 }};
+
+function updateProgress() {
+  const marked = document.querySelectorAll('input[type="radio"]:checked').length;
+  const wrap = document.getElementById('progressWrap');
+  const bar = document.getElementById('progressBar');
+  const txt = document.getElementById('progressText');
+  if (marked > 0) {
+    wrap.style.display = 'block';
+    const pct = (marked / total) * 100;
+    bar.style.width = pct + '%';
+    bar.style.background = pct === 100 ? '#22c55e' : 'var(--accent)';
+    txt.textContent = marked + ' / ' + total;
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function highlightCard(id, status) {
+  const card = document.getElementById('card_' + id);
+  card.classList.remove('card-present', 'card-absent', 'card-late');
+  card.classList.add('card-' + status);
+  updateProgress();
+}
+
+function markAll(status) {
+  document.querySelectorAll('input[value="' + status + '"]').forEach(r => {
+    r.checked = true;
+    highlightCard(r.name.replace('student_', ''), status);
+  });
+  updateProgress();
+}
+
+function clearAll() {
+  document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+  document.querySelectorAll('.att-card').forEach(c => {
+    c.classList.remove('card-present', 'card-absent', 'card-late');
+  });
+  document.getElementById('progressWrap').style.display = 'none';
+}
+
+document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+  const date = this.querySelector('[name="attendance_date"]').value;
+  if (!date) { e.preventDefault(); alert('Please select a date.'); return; }
+  const checked = document.querySelectorAll('input[type="radio"]:checked').length;
+  if (checked === 0) { e.preventDefault(); alert('Please mark at least one student.'); return; }
+  const btn = this.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = '⏳ Saving...';
+});
+
+document.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener('change', updateProgress));
+</script>
+{% endblock %}

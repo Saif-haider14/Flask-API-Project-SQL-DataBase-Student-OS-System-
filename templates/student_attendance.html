@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ student.name }} — Attendance History{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div>
+    <h1 class="page-title">📊 {{ student.name }}'s Attendance</h1>
+    <p class="page-sub">Roll No: {{ student.roll_no }} | Grade: {{ student.grade }}</p>
+  </div>
+  <div class="hero-actions">
+    <a href="{{ url_for('attendance') }}" class="btn-secondary">← Back</a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-row" style="margin-bottom:24px;">
+  <div class="stat-box">
+    <div class="stat-num">{{ total_days }}</div>
+    <div class="stat-lbl">📅 Total Days</div>
+  </div>
+  <div class="stat-box stat-green">
+    <div class="stat-num">{{ present_days }}</div>
+    <div class="stat-lbl">✅ Present</div>
+  </div>
+  <div class="stat-box {% if attendance_percentage >= 75 %}stat-green{% else %}stat-red{% endif %}">
+    <div class="stat-num">{{ attendance_percentage }}%</div>
+    <div class="stat-lbl">📈 Attendance</div>
+  </div>
+</div>
+
+<!-- History Table -->
+<div class="card">
+  <div class="card-header">
+    <h2 style="font-size:16px; margin:0;">Attendance History (Last 50 Records)</h2>
+  </div>
+  {% if attendance_history %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Date</th><th>Status</th><th>Time Marked</th></tr>
+      </thead>
+      <tbody>
+        {% for r in attendance_history %}
+        <tr>
+          <td>{{ r.date }}</td>
+          <td>
+            {% if r.status == 'present' %}
+              <span class="badge badge-green">Present</span>
+            {% elif r.status == 'absent' %}
+              <span class="badge badge-red">Absent</span>
+            {% elif r.status == 'late' %}
+              <span class="badge badge-yellow">Late</span>
+            {% endif %}
+          </td>
+          <td>{{ r.time_marked if r.time_marked else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div style="font-size:48px;">📭</div>
+    <h3>No attendance records yet</h3>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

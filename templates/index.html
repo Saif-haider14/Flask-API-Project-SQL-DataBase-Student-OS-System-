@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — StudentOS{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div>
+    <h1 class="page-title">Student Records</h1>
+    <p class="page-subtitle">{{ students|length }} student{{ 's' if students|length != 1 }} enrolled</p>
+  </div>
+
+  <form class="search-form" method="GET" action="{{ url_for('index') }}">
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search by name, roll no, grade…"
+        class="search-input"
+        autocomplete="off"
+      />
+      {% if query %}
+        <a href="{{ url_for('index') }}" class="clear-search">✕</a>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn-search">Search</button>
+  </form>
+</div>
+
+{% if students %}
+  <div class="table-wrap">
+    <table class="student-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>Roll No</th>
+          <th>Grade</th>
+          <th>Phone</th>
+          <th>Date of Birth</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr class="student-row" style="animation-delay: {{ loop.index0 * 0.04 }}s">
+          <td class="td-index">{{ loop.index }}</td>
+          <td class="td-student">
+            <div class="avatar" style="--hue: {{ (s['name']|length * 47) % 360 }}">
+              {{ s['name'][0].upper() }}
+            </div>
+            <div>
+              <div class="student-name">{{ s['name'] }}</div>
+              <div class="student-email">{{ s['email'] }}</div>
+            </div>
+          </td>
+          <td><span class="badge">{{ s['roll_no'] }}</span></td>
+          <td>{{ s['grade'] }}</td>
+          <td>{{ s['phone'] }}</td>
+          <td>{{ s['dob'] }}</td>
+          <td class="td-actions">
+            <a href="{{ url_for('edit', student_id=s['id']) }}" class="btn-edit">Edit</a>
+            <form method="POST" action="{{ url_for('delete', student_id=s['id']) }}" class="delete-form">
+              <button type="button" class="btn-delete" onclick="confirmDelete(this)">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">◎</div>
+    {% if query %}
+      <h2>No results for "{{ query }}"</h2>
+      <p>Try a different name, roll number, or grade.</p>
+      <a href="{{ url_for('index') }}" class="btn-primary">Clear search</a>
+    {% else %}
+      <h2>No students yet</h2>
+      <p>Add your first student to get started.</p>
+      <a href="{{ url_for('add') }}" class="btn-primary">+ Add Student</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}
